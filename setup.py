@@ -59,7 +59,7 @@ def compile_extensions(macros, compat=False):
     # common vars
     libraries = ['rrd']
     include_dirs = [package_dir, '/usr/local/include']
-    library_dirs = ['/usr/local/lib']
+    library_dirs = ['/usr/local/lib', '/opt/homebrew/lib']
     compiler_args = dict(
         libraries=libraries,
         include_dirs=include_dirs,
