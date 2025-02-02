@@ -29,30 +29,30 @@
 /* Some macros to maintain compatibility between Python 2.x and 3.x */
 #if PY_MAJOR_VERSION >= 3
 #define HAVE_PY3K
-#define PyRRD_String_Check(x)                 PyUnicode_Check(x)
-#define PyRRD_String_FromString(x)            PyUnicode_FromString(x)
-#define PyRRD_String_AS_STRING(x)             PyUnicode_AsUTF8(x)
-#define PyRRD_String_FromStringAndSize(x, y)  PyBytes_FromStringAndSize(x, y)
-#define PyRRD_String_Size(x)                  PyUnicode_Size(x)
-#define PyRRD_Int_FromLong(x)                 PyLong_FromLong(x)
-#define PyRRD_Int_FromString(x, y, z)         PyLong_FromString(x,y,z)
-#define PyRRD_Long_Check(x)                   PyLong_Check(x)
+#define PyRRD_String_Check(x) PyUnicode_Check(x)
+#define PyRRD_String_FromString(x) PyUnicode_FromString(x)
+#define PyRRD_String_AS_STRING(x) PyUnicode_AsUTF8(x)
+#define PyRRD_String_FromStringAndSize(x, y) PyBytes_FromStringAndSize(x, y)
+#define PyRRD_String_Size(x) PyUnicode_Size(x)
+#define PyRRD_Int_FromLong(x) PyLong_FromLong(x)
+#define PyRRD_Int_FromString(x, y, z) PyLong_FromString(x, y, z)
+#define PyRRD_Long_Check(x) PyLong_Check(x)
 #else
-#define PyRRD_String_Check(x)                 PyString_Check(x)
-#define PyRRD_String_FromString(x)            PyString_FromString(x)
-#define PyRRD_String_AS_STRING(x)             PyString_AS_STRING(x)
-#define PyRRD_String_FromStringAndSize(x, y)  PyString_FromStringAndSize(x, y)
-#define PyRRD_String_Size(x)                  PyString_Size(x)
-#define PyRRD_Int_FromLong(x)                 PyInt_FromLong(x)
-#define PyRRD_Int_FromString(x, y, z)         PyInt_FromString(x,y,z)
-#define PyRRD_Long_Check(x)                   (PyInt_Check(x) || PyLong_Check(x))
+#define PyRRD_String_Check(x) PyString_Check(x)
+#define PyRRD_String_FromString(x) PyString_FromString(x)
+#define PyRRD_String_AS_STRING(x) PyString_AS_STRING(x)
+#define PyRRD_String_FromStringAndSize(x, y) PyString_FromStringAndSize(x, y)
+#define PyRRD_String_Size(x) PyString_Size(x)
+#define PyRRD_Int_FromLong(x) PyInt_FromLong(x)
+#define PyRRD_Int_FromString(x, y, z) PyInt_FromString(x, y, z)
+#define PyRRD_Long_Check(x) (PyInt_Check(x) || PyLong_Check(x))
 #endif
 
 #ifndef Py_UNUSED
 #ifdef __GNUC__
- #define Py_UNUSED(name) _unused_ ## name __attribute__((unused))
+#define Py_UNUSED(name) _unused_##name __attribute__((unused))
 #else
- #define Py_UNUSED(name) _unused_ ## -name
+#define Py_UNUSED(name) _unused_## - name
 #endif
 #endif
 
@@ -103,17 +103,18 @@ PyRRD_DateTime_FromTS(time_t ts)
 const char *
 PyRRD_String_FromCF(enum cf_en cf)
 {
-    switch (cf) {
-        case CF_AVERAGE:
-            return "AVERAGE";
-        case CF_MINIMUM:
-            return "MIN";
-        case CF_MAXIMUM:
-            return "MAX";
-        case CF_LAST:
-            return "LAST";
-        default:
-            return "INVALID";
+    switch (cf)
+    {
+    case CF_AVERAGE:
+        return "AVERAGE";
+    case CF_MINIMUM:
+        return "MIN";
+    case CF_MAXIMUM:
+        return "MAX";
+    case CF_LAST:
+        return "LAST";
+    default:
+        return "INVALID";
     }
 }
 
@@ -134,14 +135,16 @@ convert_args(char *command, PyObject *args, char ***rrdtool_argv, int *rrdtool_a
     argv_count = element_count = 0;
     args_count = PyTuple_Size(args);
 
-    for (i = 0; i < args_count; i++) {
+    for (i = 0; i < args_count; i++)
+    {
         o = PyTuple_GET_ITEM(args, i);
 
         if (PyRRD_String_Check(o))
             element_count++;
         else if (PyList_CheckExact(o))
             element_count += PyList_Size(o);
-        else {
+        else
+        {
             PyErr_Format(PyExc_TypeError,
                          "Argument %d must be str or a list of str", i);
             return -1;
@@ -153,28 +156,34 @@ convert_args(char *command, PyObject *args, char ***rrdtool_argv, int *rrdtool_a
     if (*rrdtool_argv == NULL)
         return -1;
 
-    for (i = 0; i < args_count; i++) {
+    for (i = 0; i < args_count; i++)
+    {
         o = PyTuple_GET_ITEM(args, i);
 
         if (PyRRD_String_Check(o))
             (*rrdtool_argv)[++argv_count] = (char *)PyRRD_String_AS_STRING(o);
-        else if (PyList_CheckExact(o)) {
-            for (j = 0; j < PyList_Size(o); j++) {
+        else if (PyList_CheckExact(o))
+        {
+            for (j = 0; j < PyList_Size(o); j++)
+            {
                 lo = PyList_GetItem(o, j);
 
                 if (PyRRD_String_Check(lo))
                     (*rrdtool_argv)[++argv_count] = (char *)PyRRD_String_AS_STRING(lo);
-                else {
+                else
+                {
                     PyMem_Del(*rrdtool_argv);
                     PyErr_Format(PyExc_TypeError,
-                      "Element %d in argument %d must be str", j, i);
+                                 "Element %d in argument %d must be str", j, i);
                     return -1;
                 }
             }
-        } else {
+        }
+        else
+        {
             PyMem_Del(*rrdtool_argv);
             PyErr_Format(rrdtool_ProgrammingError,
-              "Argument %d must be str or list of str", i);
+                         "Argument %d must be str or list of str", i);
             return -1;
         }
     }
@@ -208,40 +217,45 @@ _rrdtool_util_info2dict(const rrd_info_t *data)
 
     dict = PyDict_New();
 
-    while (data) {
+    while (data)
+    {
         val = NULL;
 
-        switch (data->type) {
-            case RD_I_VAL:
-                if (isnan(data->value.u_val)) {
-                    Py_INCREF(Py_None);
-                    val = Py_None;
-                } else
-                    val = PyFloat_FromDouble(data->value.u_val);
-                break;
+        switch (data->type)
+        {
+        case RD_I_VAL:
+            if (isnan(data->value.u_val))
+            {
+                Py_INCREF(Py_None);
+                val = Py_None;
+            }
+            else
+                val = PyFloat_FromDouble(data->value.u_val);
+            break;
 
-            case RD_I_CNT:
-                val = PyLong_FromUnsignedLong(data->value.u_cnt);
-                break;
+        case RD_I_CNT:
+            val = PyLong_FromUnsignedLong(data->value.u_cnt);
+            break;
 
-            case RD_I_INT:
-                val = PyLong_FromLong(data->value.u_int);
-                break;
+        case RD_I_INT:
+            val = PyLong_FromLong(data->value.u_int);
+            break;
 
-            case RD_I_STR:
-                val = PyRRD_String_FromString(data->value.u_str);
-                break;
+        case RD_I_STR:
+            val = PyRRD_String_FromString(data->value.u_str);
+            break;
 
-            case RD_I_BLO:
-                val = PyRRD_String_FromStringAndSize(
-                    (char *)data->value.u_blo.ptr,
-                    data->value.u_blo.size);
-                break;
-            default:
-                break;
+        case RD_I_BLO:
+            val = PyRRD_String_FromStringAndSize(
+                (char *)data->value.u_blo.ptr,
+                data->value.u_blo.size);
+            break;
+        default:
+            break;
         }
 
-        if (val != NULL) {
+        if (val != NULL)
+        {
             PyDict_SetItemString(dict, data->key, val);
             Py_DECREF(val);
         }
@@ -271,7 +285,7 @@ static PyObject *
 _rrdtool_create(PyObject *Py_UNUSED(self), PyObject *args)
 {
     char **rrdtool_argv = NULL;
-    int    rrdtool_argc = 0;
+    int rrdtool_argc = 0;
     PyObject *ret;
     int status;
 
@@ -279,14 +293,17 @@ _rrdtool_create(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-    status = rrd_create(rrdtool_argc, rrdtool_argv);
+        status = rrd_create(rrdtool_argc, rrdtool_argv);
     Py_END_ALLOW_THREADS
 
-    if (status == -1) {
+        if (status == -1)
+    {
         PyErr_SetString(rrdtool_OperationalError, rrd_get_error());
         rrd_clear_error();
         ret = NULL;
-    } else {
+    }
+    else
+    {
         Py_INCREF(Py_None);
         ret = Py_None;
     }
@@ -310,7 +327,7 @@ static PyObject *
 _rrdtool_dump(PyObject *Py_UNUSED(self), PyObject *args)
 {
     char **rrdtool_argv = NULL;
-    int    rrdtool_argc = 0;
+    int rrdtool_argc = 0;
     PyObject *ret;
     int status;
 
@@ -318,14 +335,17 @@ _rrdtool_dump(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-    status = rrd_dump(rrdtool_argc, rrdtool_argv);
+        status = rrd_dump(rrdtool_argc, rrdtool_argv);
     Py_END_ALLOW_THREADS
 
-    if (status != 0) {
+        if (status != 0)
+    {
         PyErr_SetString(rrdtool_OperationalError, rrd_get_error());
         rrd_clear_error();
         ret = NULL;
-    } else {
+    }
+    else
+    {
         Py_INCREF(Py_None);
         ret = Py_None;
     }
@@ -349,7 +369,7 @@ static PyObject *
 _rrdtool_update(PyObject *Py_UNUSED(self), PyObject *args)
 {
     char **rrdtool_argv = NULL;
-    int    rrdtool_argc = 0;
+    int rrdtool_argc = 0;
     PyObject *ret;
     int status;
 
@@ -357,14 +377,17 @@ _rrdtool_update(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-    status = rrd_update(rrdtool_argc, rrdtool_argv);
+        status = rrd_update(rrdtool_argc, rrdtool_argv);
     Py_END_ALLOW_THREADS
 
-    if (status == -1) {
+        if (status == -1)
+    {
         PyErr_SetString(rrdtool_OperationalError, rrd_get_error());
         rrd_clear_error();
         ret = NULL;
-    } else {
+    }
+    else
+    {
         Py_INCREF(Py_None);
         ret = Py_None;
     }
@@ -373,8 +396,8 @@ _rrdtool_update(PyObject *Py_UNUSED(self), PyObject *args)
     return ret;
 }
 
-static char _rrdtool_updatev__doc__[] = "Store a new set of values into "\
-  "the Round Robin Database and return an info dictionary.\n\n\
+static char _rrdtool_updatev__doc__[] = "Store a new set of values into "
+                                        "the Round Robin Database and return an info dictionary.\n\n\
   This function works in the same manner as 'update', but will return an\n\
   info dictionary instead of None.";
 
@@ -382,7 +405,7 @@ static PyObject *
 _rrdtool_updatev(PyObject *Py_UNUSED(self), PyObject *args)
 {
     char **rrdtool_argv = NULL;
-    int    rrdtool_argc = 0;
+    int rrdtool_argc = 0;
     PyObject *ret;
     rrd_info_t *data;
 
@@ -390,14 +413,17 @@ _rrdtool_updatev(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-    data = rrd_update_v(rrdtool_argc, rrdtool_argv);
+        data = rrd_update_v(rrdtool_argc, rrdtool_argv);
     Py_END_ALLOW_THREADS
 
-    if (data == NULL) {
+        if (data == NULL)
+    {
         PyErr_SetString(rrdtool_OperationalError, rrd_get_error());
         rrd_clear_error();
         ret = NULL;
-    } else {
+    }
+    else
+    {
         ret = _rrdtool_util_info2dict(data);
         rrd_info_free(data);
     }
@@ -423,7 +449,7 @@ static PyObject *
 _rrdtool_fetch(PyObject *Py_UNUSED(self), PyObject *args)
 {
     char **rrdtool_argv = NULL;
-    int    rrdtool_argc = 0;
+    int rrdtool_argc = 0;
     PyObject *ret, *range_tup, *dsnam_tup, *data_list, *t;
     rrd_value_t *data, *datai, dv;
     unsigned long step, ds_cnt, i, j, row;
@@ -435,15 +461,18 @@ _rrdtool_fetch(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-    status = rrd_fetch(rrdtool_argc, rrdtool_argv, &start, &end, &step,
-                       &ds_cnt, &ds_namv, &data);
+        status = rrd_fetch(rrdtool_argc, rrdtool_argv, &start, &end, &step,
+                           &ds_cnt, &ds_namv, &data);
     Py_END_ALLOW_THREADS
 
-    if (status == -1) {
+        if (status == -1)
+    {
         PyErr_SetString(rrdtool_OperationalError, rrd_get_error());
         rrd_clear_error();
         ret = NULL;
-    } else {
+    }
+    else
+    {
         row = (end - start) / step;
         ret = PyTuple_New(3);
         range_tup = PyTuple_New(3);
@@ -456,24 +485,28 @@ _rrdtool_fetch(PyObject *Py_UNUSED(self), PyObject *args)
 
         datai = data;
 
-        PyTuple_SET_ITEM(range_tup, 0, PyRRD_Int_FromLong((long) start));
-        PyTuple_SET_ITEM(range_tup, 1, PyRRD_Int_FromLong((long) end));
-        PyTuple_SET_ITEM(range_tup, 2, PyRRD_Int_FromLong((long) step));
+        PyTuple_SET_ITEM(range_tup, 0, PyRRD_Int_FromLong((long)start));
+        PyTuple_SET_ITEM(range_tup, 1, PyRRD_Int_FromLong((long)end));
+        PyTuple_SET_ITEM(range_tup, 2, PyRRD_Int_FromLong((long)step));
 
         for (i = 0; i < ds_cnt; i++)
             PyTuple_SET_ITEM(dsnam_tup, i, PyRRD_String_FromString(ds_namv[i]));
 
-        for (i = 0; i < row; i++) {
+        for (i = 0; i < row; i++)
+        {
             t = PyTuple_New(ds_cnt);
             PyList_SET_ITEM(data_list, i, t);
 
-            for (j = 0; j < ds_cnt; j++) {
+            for (j = 0; j < ds_cnt; j++)
+            {
                 dv = *(datai++);
-                if (isnan(dv)) {
+                if (isnan(dv))
+                {
                     PyTuple_SET_ITEM(t, j, Py_None);
                     Py_INCREF(Py_None);
-                } else
-                    PyTuple_SET_ITEM(t, j, PyFloat_FromDouble((double) dv));
+                }
+                else
+                    PyTuple_SET_ITEM(t, j, PyFloat_FromDouble((double)dv));
             }
         }
 
@@ -501,7 +534,7 @@ static PyObject *
 _rrdtool_flushcached(PyObject *Py_UNUSED(self), PyObject *args)
 {
     char **rrdtool_argv = NULL;
-    int    rrdtool_argc = 0;
+    int rrdtool_argc = 0;
     PyObject *ret;
     int status;
 
@@ -509,14 +542,17 @@ _rrdtool_flushcached(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-    status = rrd_flushcached(rrdtool_argc, rrdtool_argv);
+        status = rrd_flushcached(rrdtool_argc, rrdtool_argv);
     Py_END_ALLOW_THREADS
 
-    if (status != 0) {
+        if (status != 0)
+    {
         PyErr_SetString(rrdtool_OperationalError, rrd_get_error());
         rrd_clear_error();
         ret = NULL;
-    } else {
+    }
+    else
+    {
         Py_INCREF(Py_None);
         ret = Py_None;
     }
@@ -525,8 +561,8 @@ _rrdtool_flushcached(PyObject *Py_UNUSED(self), PyObject *args)
     return ret;
 }
 
-static char _rrdtool_graph__doc__[] = "Create a graph based on one or more " \
-  "RRDs.\n\n\
+static char _rrdtool_graph__doc__[] = "Create a graph based on one or more "
+                                      "RRDs.\n\n\
   Usage: graph(args..)\n\
   Arguments:\n\n\
     filename | -\n\
@@ -593,7 +629,7 @@ static PyObject *
 _rrdtool_graph(PyObject *Py_UNUSED(self), PyObject *args)
 {
     char **rrdtool_argv = NULL;
-    int    rrdtool_argc = 0;
+    int rrdtool_argc = 0;
     PyObject *ret;
     int xsize, ysize, i, status;
     double ymin, ymax;
@@ -603,33 +639,40 @@ _rrdtool_graph(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-    status = rrd_graph(rrdtool_argc, rrdtool_argv, &calcpr, &xsize, &ysize,
-                       NULL, &ymin, &ymax);
+        status = rrd_graph(rrdtool_argc, rrdtool_argv, &calcpr, &xsize, &ysize,
+                           NULL, &ymin, &ymax);
     Py_END_ALLOW_THREADS
 
-    if (status == -1) {
+        if (status == -1)
+    {
         PyErr_SetString(rrdtool_OperationalError, rrd_get_error());
         rrd_clear_error();
         ret = NULL;
-    } else {
+    }
+    else
+    {
         ret = PyTuple_New(3);
 
-        PyTuple_SET_ITEM(ret, 0, PyRRD_Int_FromLong((long) xsize));
-        PyTuple_SET_ITEM(ret, 1, PyRRD_Int_FromLong((long) ysize));
+        PyTuple_SET_ITEM(ret, 0, PyRRD_Int_FromLong((long)xsize));
+        PyTuple_SET_ITEM(ret, 1, PyRRD_Int_FromLong((long)ysize));
 
-        if (calcpr) {
+        if (calcpr)
+        {
             PyObject *e, *t;
 
             e = PyList_New(0);
             PyTuple_SET_ITEM(ret, 2, e);
 
-            for (i = 0; calcpr[i]; i++) {
+            for (i = 0; calcpr[i]; i++)
+            {
                 t = PyRRD_String_FromString(calcpr[i]);
                 PyList_Append(e, t);
                 Py_DECREF(t);
                 rrd_freemem(calcpr[i]);
             }
-        } else {
+        }
+        else
+        {
             Py_INCREF(Py_None);
             PyTuple_SET_ITEM(ret, 2, Py_None);
         }
@@ -639,8 +682,8 @@ _rrdtool_graph(PyObject *Py_UNUSED(self), PyObject *args)
     return ret;
 }
 
-static char _rrdtool_graphv__doc__[] = "Create a graph based on one or more " \
-  "RRDs and return data in RRDtool info format.\n\n\
+static char _rrdtool_graphv__doc__[] = "Create a graph based on one or more "
+                                       "RRDs and return data in RRDtool info format.\n\n\
   This function works the same way as 'graph', but will return a info\n\
   dictionary instead of None.\n\n\
   Full documentation can be found at (graphv section):\n\
@@ -650,7 +693,7 @@ static PyObject *
 _rrdtool_graphv(PyObject *Py_UNUSED(self), PyObject *args)
 {
     char **rrdtool_argv = NULL;
-    int    rrdtool_argc = 0;
+    int rrdtool_argc = 0;
     PyObject *ret;
     rrd_info_t *data;
 
@@ -658,14 +701,17 @@ _rrdtool_graphv(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-    data = rrd_graph_v(rrdtool_argc, rrdtool_argv);
+        data = rrd_graph_v(rrdtool_argc, rrdtool_argv);
     Py_END_ALLOW_THREADS
 
-    if (data == NULL) {
+        if (data == NULL)
+    {
         PyErr_SetString(rrdtool_OperationalError, rrd_get_error());
         rrd_clear_error();
         ret = NULL;
-    } else {
+    }
+    else
+    {
         ret = _rrdtool_util_info2dict(data);
         rrd_info_free(data);
     }
@@ -674,8 +720,8 @@ _rrdtool_graphv(PyObject *Py_UNUSED(self), PyObject *args)
     return ret;
 }
 
-static char _rrdtool_xport__doc__[] = "Dictionary representation of data " \
-  "stored in RRDs.\n\n\
+static char _rrdtool_xport__doc__[] = "Dictionary representation of data "
+                                      "stored in RRDs.\n\n\
   Usage: xport(args..)\n\
   Arguments:\n\n\
     [-s[--start seconds]\n\
@@ -695,7 +741,7 @@ static PyObject *
 _rrdtool_xport(PyObject *Py_UNUSED(self), PyObject *args)
 {
     char **rrdtool_argv = NULL;
-    int    rrdtool_argc = 0;
+    int rrdtool_argc = 0;
     PyObject *ret;
     int xsize, status;
     char **legend_v;
@@ -707,15 +753,18 @@ _rrdtool_xport(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-    status = rrd_xport(rrdtool_argc, rrdtool_argv, &xsize, &start, &end, &step,
-                       &col_cnt, &legend_v, &data);
+        status = rrd_xport(rrdtool_argc, rrdtool_argv, &xsize, &start, &end, &step,
+                           &col_cnt, &legend_v, &data);
     Py_END_ALLOW_THREADS
 
-    if (status == -1) {
+        if (status == -1)
+    {
         PyErr_SetString(rrdtool_OperationalError, rrd_get_error());
         rrd_clear_error();
         ret = NULL;
-    } else {
+    }
+    else
+    {
         PyObject *meta_dict, *data_list, *legend_list, *t;
         rrd_value_t dv;
         unsigned long i, j, row_cnt = (end - start) / step;
@@ -731,39 +780,44 @@ _rrdtool_xport(PyObject *Py_UNUSED(self), PyObject *args)
         datai = data;
 
         PyDict_SetItem(meta_dict,
-            PyRRD_String_FromString("start"),
-            PyRRD_Int_FromLong((long) start));
+                       PyRRD_String_FromString("start"),
+                       PyRRD_Int_FromLong((long)start));
         PyDict_SetItem(meta_dict,
-            PyRRD_String_FromString("end"),
-            PyRRD_Int_FromLong((long) end));
+                       PyRRD_String_FromString("end"),
+                       PyRRD_Int_FromLong((long)end));
         PyDict_SetItem(meta_dict,
-            PyRRD_String_FromString("step"),
-            PyRRD_Int_FromLong((long) step));
+                       PyRRD_String_FromString("step"),
+                       PyRRD_Int_FromLong((long)step));
         PyDict_SetItem(meta_dict,
-            PyRRD_String_FromString("rows"),
-            PyRRD_Int_FromLong((long) row_cnt));
+                       PyRRD_String_FromString("rows"),
+                       PyRRD_Int_FromLong((long)row_cnt));
         PyDict_SetItem(meta_dict,
-            PyRRD_String_FromString("columns"),
-            PyRRD_Int_FromLong((long) col_cnt));
+                       PyRRD_String_FromString("columns"),
+                       PyRRD_Int_FromLong((long)col_cnt));
         PyDict_SetItem(meta_dict,
-            PyRRD_String_FromString("legend"),
-            legend_list);
+                       PyRRD_String_FromString("legend"),
+                       legend_list);
 
         for (i = 0; i < col_cnt; i++)
             PyList_SET_ITEM(legend_list, i, PyRRD_String_FromString(legend_v[i]));
 
-        for (i = 0; i < row_cnt; i++) {
+        for (i = 0; i < row_cnt; i++)
+        {
             t = PyTuple_New(col_cnt);
             PyList_SET_ITEM(data_list, i, t);
 
-            for (j = 0; j < col_cnt; j++) {
+            for (j = 0; j < col_cnt; j++)
+            {
                 dv = *(datai++);
 
-                if (isnan(dv)) {
+                if (isnan(dv))
+                {
                     PyTuple_SET_ITEM(t, j, Py_None);
                     Py_INCREF(Py_None);
-                } else {
-                    PyTuple_SET_ITEM(t, j, PyFloat_FromDouble((double) dv));
+                }
+                else
+                {
+                    PyTuple_SET_ITEM(t, j, PyFloat_FromDouble((double)dv));
                 }
             }
         }
@@ -780,8 +834,8 @@ _rrdtool_xport(PyObject *Py_UNUSED(self), PyObject *args)
     return ret;
 }
 
-static char _rrdtool_tune__doc__[] = "Modify some basic properties of a " \
-  "Round Robin Database.\n\n\
+static char _rrdtool_tune__doc__[] = "Modify some basic properties of a "
+                                     "Round Robin Database.\n\n\
   Usage: tune(args..)\n\
   Arguments:\n\n\
     filename\n\
@@ -797,7 +851,7 @@ static PyObject *
 _rrdtool_tune(PyObject *Py_UNUSED(self), PyObject *args)
 {
     char **rrdtool_argv = NULL;
-    int    rrdtool_argc = 0;
+    int rrdtool_argc = 0;
     PyObject *ret;
     int status;
 
@@ -805,14 +859,17 @@ _rrdtool_tune(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-    status = rrd_tune(rrdtool_argc, rrdtool_argv);
+        status = rrd_tune(rrdtool_argc, rrdtool_argv);
     Py_END_ALLOW_THREADS
 
-    if (status == -1) {
+        if (status == -1)
+    {
         PyErr_SetString(rrdtool_OperationalError, rrd_get_error());
         rrd_clear_error();
         ret = NULL;
-    } else {
+    }
+    else
+    {
         Py_INCREF(Py_None);
         ret = Py_None;
     }
@@ -821,8 +878,8 @@ _rrdtool_tune(PyObject *Py_UNUSED(self), PyObject *args)
     return ret;
 }
 
-static char _rrdtool_first__doc__[] = "Get the first UNIX timestamp of the "\
-  "first data sample in an Round Robin Database.\n\n\
+static char _rrdtool_first__doc__[] = "Get the first UNIX timestamp of the "
+                                      "first data sample in an Round Robin Database.\n\n\
   Usage: first(args..)\n\
   Arguments:\n\n\
     filename\n\
@@ -835,7 +892,7 @@ static PyObject *
 _rrdtool_first(PyObject *Py_UNUSED(self), PyObject *args)
 {
     char **rrdtool_argv = NULL;
-    int    rrdtool_argc = 0;
+    int rrdtool_argc = 0;
     PyObject *ret;
     int ts;
 
@@ -843,22 +900,23 @@ _rrdtool_first(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-    ts = rrd_first(rrdtool_argc, rrdtool_argv);
+        ts = rrd_first(rrdtool_argc, rrdtool_argv);
     Py_END_ALLOW_THREADS
 
-    if (ts == -1) {
+        if (ts == -1)
+    {
         PyErr_SetString(rrdtool_OperationalError, rrd_get_error());
         rrd_clear_error();
         ret = NULL;
-    } else
-        ret = PyRRD_Int_FromLong((long) ts);
+    }
+    else ret = PyRRD_Int_FromLong((long)ts);
 
     destroy_args(&rrdtool_argv);
     return ret;
 }
 
-static char _rrdtool_last__doc__[] = "Get the UNIX timestamp of the most "\
-  "recent data sample in an Round Robin Database.\n\n\
+static char _rrdtool_last__doc__[] = "Get the UNIX timestamp of the most "
+                                     "recent data sample in an Round Robin Database.\n\n\
   Usage: last(args..)\n\
   Arguments:\n\n\
     filename\n\
@@ -870,7 +928,7 @@ static PyObject *
 _rrdtool_last(PyObject *Py_UNUSED(self), PyObject *args)
 {
     char **rrdtool_argv = NULL;
-    int    rrdtool_argc = 0;
+    int rrdtool_argc = 0;
     PyObject *ret;
     int ts;
 
@@ -878,22 +936,23 @@ _rrdtool_last(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-    ts = rrd_last(rrdtool_argc, rrdtool_argv);
+        ts = rrd_last(rrdtool_argc, rrdtool_argv);
     Py_END_ALLOW_THREADS
 
-    if (ts == -1) {
+        if (ts == -1)
+    {
         PyErr_SetString(rrdtool_OperationalError, rrd_get_error());
         rrd_clear_error();
         ret = NULL;
-    } else
-        ret = PyRRD_Int_FromLong((long) ts);
+    }
+    else ret = PyRRD_Int_FromLong((long)ts);
 
     destroy_args(&rrdtool_argv);
     return ret;
 }
 
-static char _rrdtool_resize__doc__[] = "Modify the number of rows in a "\
- "Round Robin Database.\n\n\
+static char _rrdtool_resize__doc__[] = "Modify the number of rows in a "
+                                       "Round Robin Database.\n\n\
   Usage: resize(args..)\n\
   Arguments:\n\n\
     filename\n\
@@ -907,7 +966,7 @@ static PyObject *
 _rrdtool_resize(PyObject *Py_UNUSED(self), PyObject *args)
 {
     char **rrdtool_argv = NULL;
-    int    rrdtool_argc = 0;
+    int rrdtool_argc = 0;
     PyObject *ret;
     int status;
 
@@ -915,14 +974,17 @@ _rrdtool_resize(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-    status = rrd_resize(rrdtool_argc, rrdtool_argv);
+        status = rrd_resize(rrdtool_argc, rrdtool_argv);
     Py_END_ALLOW_THREADS
 
-    if (status == -1) {
+        if (status == -1)
+    {
         PyErr_SetString(rrdtool_OperationalError, rrd_get_error());
         rrd_clear_error();
         ret = NULL;
-    } else {
+    }
+    else
+    {
         Py_INCREF(Py_None);
         ret = Py_None;
     }
@@ -931,8 +993,8 @@ _rrdtool_resize(PyObject *Py_UNUSED(self), PyObject *args)
     return ret;
 }
 
-static char _rrdtool_info__doc__[] = "Extract header information from an "\
- "Round Robin Database.\n\n\
+static char _rrdtool_info__doc__[] = "Extract header information from an "
+                                     "Round Robin Database.\n\n\
   Usage: info(filename, ...)\n\
   Arguments:\n\n\
     filename\n\
@@ -945,7 +1007,7 @@ static PyObject *
 _rrdtool_info(PyObject *Py_UNUSED(self), PyObject *args)
 {
     char **rrdtool_argv = NULL;
-    int    rrdtool_argc = 0;
+    int rrdtool_argc = 0;
     PyObject *ret;
     rrd_info_t *data;
 
@@ -953,14 +1015,17 @@ _rrdtool_info(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-    data = rrd_info(rrdtool_argc, rrdtool_argv);
+        data = rrd_info(rrdtool_argc, rrdtool_argv);
     Py_END_ALLOW_THREADS
 
-    if (data == NULL) {
+        if (data == NULL)
+    {
         PyErr_SetString(rrdtool_OperationalError, rrd_get_error());
         rrd_clear_error();
         ret = NULL;
-    } else {
+    }
+    else
+    {
         ret = _rrdtool_util_info2dict(data);
         rrd_info_free(data);
     }
@@ -969,8 +1034,8 @@ _rrdtool_info(PyObject *Py_UNUSED(self), PyObject *args)
     return ret;
 }
 
-static char _rrdtool_lastupdate__doc__[] = "Returns datetime and value stored "\
- "for each datum in the most recent update of an RRD.\n\n\
+static char _rrdtool_lastupdate__doc__[] = "Returns datetime and value stored "
+                                           "for each datum in the most recent update of an RRD.\n\n\
   Usage: lastupdate(filename, ...)\n\
   Arguments:\n\n\
     filename\n\
@@ -982,7 +1047,7 @@ static PyObject *
 _rrdtool_lastupdate(PyObject *Py_UNUSED(self), PyObject *args)
 {
     char **rrdtool_argv = NULL;
-    int    rrdtool_argc = 0;
+    int rrdtool_argc = 0;
     PyObject *ret, *ds_dict, *lastupd;
     int status;
     time_t last_update;
@@ -991,24 +1056,28 @@ _rrdtool_lastupdate(PyObject *Py_UNUSED(self), PyObject *args)
 
     if (convert_args("lastupdate", args, &rrdtool_argv, &rrdtool_argc) == -1)
         return NULL;
-    else if (rrdtool_argc < 2) {
+    else if (rrdtool_argc < 2)
+    {
         PyErr_SetString(rrdtool_ProgrammingError, "Missing filename argument");
         return NULL;
     }
 
     Py_BEGIN_ALLOW_THREADS
-    status = rrd_lastupdate_r(rrdtool_argv[1],
-                              &last_update,
-                              &ds_cnt,
-                              &ds_names,
-                              &last_ds);
+        status = rrd_lastupdate_r(rrdtool_argv[1],
+                                  &last_update,
+                                  &ds_cnt,
+                                  &ds_names,
+                                  &last_ds);
     Py_END_ALLOW_THREADS
 
-    if (status != 0) {
+        if (status != 0)
+    {
         PyErr_SetString(rrdtool_OperationalError, rrd_get_error());
         rrd_clear_error();
         ret = NULL;
-    } else {
+    }
+    else
+    {
         /* convert last_update to Python datetime object */
         ret = PyDict_New();
         ds_dict = PyDict_New();
@@ -1020,11 +1089,13 @@ _rrdtool_lastupdate(PyObject *Py_UNUSED(self), PyObject *args)
         Py_DECREF(lastupd);
         Py_DECREF(ds_dict);
 
-        for (i = 0; i < ds_cnt; i++) {
-            PyObject* val = Py_None;
+        for (i = 0; i < ds_cnt; i++)
+        {
+            PyObject *val = Py_None;
 
             double num;
-            if (sscanf(last_ds[i], "%lf", &num) == 1) {
+            if (sscanf(last_ds[i], "%lf", &num) == 1)
+            {
                 val = PyFloat_FromDouble(num);
             }
 
@@ -1042,7 +1113,6 @@ _rrdtool_lastupdate(PyObject *Py_UNUSED(self), PyObject *args)
 
         free(last_ds);
         free(ds_names);
-
     }
 
     destroy_args(&rrdtool_argv);
@@ -1078,7 +1148,8 @@ _rrdtool_fetch_cb_wrapper(
 
     gstate = PyGILState_Ensure();
 
-    if (_rrdtool_fetch_callable == NULL) {
+    if (_rrdtool_fetch_callable == NULL)
+    {
         rrd_set_error("use rrdtool.register_fetch_cb to register a fetch callback");
         goto gil_release_err;
     }
@@ -1114,86 +1185,112 @@ _rrdtool_fetch_cb_wrapper(
     Py_DECREF(args);
     Py_DECREF(kwargs);
 
-    if (ret == NULL) {
+    if (ret == NULL)
+    {
         rrd_set_error("calling python callback failed");
         goto gil_release_err;
     }
 
     /* handle return value of callback */
-    if (!PyDict_Check(ret)) {
+    if (!PyDict_Check(ret))
+    {
         rrd_set_error("expected callback method to be a dict");
         goto gil_release_err;
     }
 
     tmp = PyDict_GetItemString(ret, "step");
-    if (tmp == NULL) {
+    if (tmp == NULL)
+    {
         rrd_set_error("expected 'step' key in callback return value");
         goto gil_release_err;
-    } else if (!PyRRD_Long_Check(tmp)) {
+    }
+    else if (!PyRRD_Long_Check(tmp))
+    {
         rrd_set_error("the 'step' key in callback return value must be int");
         goto gil_release_err;
-    } else
+    }
+    else
         *step = PyLong_AsLong(tmp);
 
     tmp = PyDict_GetItemString(ret, "start");
-    if (tmp == NULL) {
+    if (tmp == NULL)
+    {
         rrd_set_error("expected 'start' key in callback return value");
         goto gil_release_err;
-    } else if (!PyRRD_Long_Check(tmp)) {
+    }
+    else if (!PyRRD_Long_Check(tmp))
+    {
         rrd_set_error("expected 'start' key in callback return value to be "
-            "of type int");
+                      "of type int");
         goto gil_release_err;
-    } else if (PyObject_RichCompareBool(tmp, tmp_min_ts, Py_EQ) ||
-               PyObject_RichCompareBool(tmp, po_start, Py_LT)) {
+    }
+    else if (PyObject_RichCompareBool(tmp, tmp_min_ts, Py_EQ) ||
+             PyObject_RichCompareBool(tmp, po_start, Py_LT))
+    {
         rrd_set_error("expected 'start' value in callback return dict to be "
-            "equal or earlier than passed start timestamp");
+                      "equal or earlier than passed start timestamp");
         goto gil_release_err;
-    } else {
+    }
+    else
+    {
         *start = PyLong_AsLong(po_start);
 
-        if (*start == -1) {
+        if (*start == -1)
+        {
             rrd_set_error("expected 'start' value in callback return value to"
-                " not exceed LONG_MAX");
+                          " not exceed LONG_MAX");
             goto gil_release_err;
         }
     }
 
     tmp = PyDict_GetItemString(ret, "data");
-    if (tmp == NULL) {
+    if (tmp == NULL)
+    {
         rrd_set_error("expected 'data' key in callback return value");
         goto gil_release_err;
-    } else if (!PyDict_Check(tmp)) {
+    }
+    else if (!PyDict_Check(tmp))
+    {
         rrd_set_error("expected 'data' key in callback return value of type "
-            "dict");
+                      "dict");
         goto gil_release_err;
-    } else {
+    }
+    else
+    {
         *ds_cnt = (unsigned long)PyDict_Size(tmp);
         *ds_namv = (char **)calloc(*ds_cnt, sizeof(char *));
 
-        if (*ds_namv == NULL) {
+        if (*ds_namv == NULL)
+        {
             rrd_set_error("an error occurred while allocating memory for "
-                "ds_namv when allocating memory for python callback");
+                          "ds_namv when allocating memory for python callback");
             goto gil_release_err;
         }
 
         PyObject *key, *value;
-        Py_ssize_t pos = 0;  /* don't use pos for indexing */
+        Py_ssize_t pos = 0; /* don't use pos for indexing */
         unsigned int x = 0;
 
-        while (PyDict_Next(tmp, &pos, &key, &value)) {
+        while (PyDict_Next(tmp, &pos, &key, &value))
+        {
             const char *key_str = PyRRD_String_AS_STRING(key);
 
-            if (key_str == NULL) {
+            if (key_str == NULL)
+            {
                 rrd_set_error("key of 'data' element from callback return "
-                    "value is not a string");
+                              "value is not a string");
                 goto gil_release_free_dsnamv_err;
-            } else if (strlen(key_str) > DS_NAM_SIZE) {
+            }
+            else if (strlen(key_str) > DS_NAM_SIZE)
+            {
                 rrd_set_error("key '%s' longer than the allowed maximum of %d "
-                    "byte", key_str, DS_NAM_SIZE - 1);
+                              "byte",
+                              key_str, DS_NAM_SIZE - 1);
                 goto gil_release_free_dsnamv_err;
             }
 
-            if ((((*ds_namv)[x]) = (char *)malloc(sizeof(char) * DS_NAM_SIZE)) == NULL) {
+            if ((((*ds_namv)[x]) = (char *)malloc(sizeof(char) * DS_NAM_SIZE)) == NULL)
+            {
                 rrd_set_error("malloc fetch ds_namv entry");
                 goto gil_release_free_dsnamv_err;
             }
@@ -1201,11 +1298,13 @@ _rrdtool_fetch_cb_wrapper(
             strncpy((*ds_namv)[x], key_str, DS_NAM_SIZE - 1);
             (*ds_namv)[x][DS_NAM_SIZE - 1] = '\0';
 
-            if (!PyList_Check(value)) {
+            if (!PyList_Check(value))
+            {
                 rrd_set_error("expected 'data' dict values in callback return "
-                    "value of type list");
+                              "value of type list");
                 goto gil_release_free_dsnamv_err;
-            } else if (PyList_Size(value) > rowcount)
+            }
+            else if (PyList_Size(value) > rowcount)
                 rowcount = PyList_Size(value);
 
             ++x;
@@ -1213,13 +1312,16 @@ _rrdtool_fetch_cb_wrapper(
 
         *end = *start + *step * rowcount;
 
-        if (((*data) = (rrd_value_t *)malloc(*ds_cnt * rowcount * sizeof(rrd_value_t))) == NULL) {
+        if (((*data) = (rrd_value_t *)malloc(*ds_cnt * rowcount * sizeof(rrd_value_t))) == NULL)
+        {
             rrd_set_error("malloc fetch data area");
             goto gil_release_free_dsnamv_err;
         }
 
-        for (i = 0; i < *ds_cnt; i++) {
-            for (ii = 0; ii < (unsigned int)rowcount; ii++) {
+        for (i = 0; i < *ds_cnt; i++)
+        {
+            for (ii = 0; ii < (unsigned int)rowcount; ii++)
+            {
                 char *ds_namv_i = (*ds_namv)[i];
                 double va;
                 PyObject *lstv = PyList_GetItem(PyDict_GetItemString(tmp, ds_namv_i), ii);
@@ -1227,18 +1329,22 @@ _rrdtool_fetch_cb_wrapper(
                 /* lstv may be NULL here in case an IndexError has been raised;
                    in such case the rowcount is higher than the number of elements for
                    the list of that ds. use DNAN as value for these then */
-                if (lstv == NULL || lstv == Py_None) {
+                if (lstv == NULL || lstv == Py_None)
+                {
                     if (lstv == NULL)
                         PyErr_Clear();
                     va = DNAN;
                 }
-                else {
+                else
+                {
                     va = PyFloat_AsDouble(lstv);
-                    if (va == -1.0 && PyErr_Occurred()) {
+                    if (va == -1.0 && PyErr_Occurred())
+                    {
                         PyObject *exc_type, *exc_value, *exc_value_str = NULL, *exc_tb;
                         PyErr_Fetch(&exc_type, &exc_value, &exc_tb);
 
-                        if (exc_value != NULL) {
+                        if (exc_value != NULL)
+                        {
                             exc_value_str = PyObject_Str(exc_value);
                             rrd_set_error((char *)PyRRD_String_AS_STRING(exc_value_str));
                             Py_DECREF(exc_value);
@@ -1262,8 +1368,10 @@ _rrdtool_fetch_cb_wrapper(
     goto gil_release;
 
 gil_release_free_dsnamv_err:
-    for (i = 0; i < *ds_cnt; i++) {
-        if ((*ds_namv)[i]) {
+    for (i = 0; i < *ds_cnt; i++)
+    {
+        if ((*ds_namv)[i])
+        {
             free((*ds_namv)[i]);
         }
     }
@@ -1281,7 +1389,7 @@ gil_release:
 }
 
 static char _rrdtool_register_fetch_cb__doc__[] = "Register callback for "
-    "fetching data";
+                                                  "fetching data";
 
 static PyObject *
 _rrdtool_register_fetch_cb(PyObject *Py_UNUSED(self), PyObject *args)
@@ -1290,10 +1398,13 @@ _rrdtool_register_fetch_cb(PyObject *Py_UNUSED(self), PyObject *args)
 
     if (!PyArg_ParseTuple(args, "O", &callable))
         return NULL;
-    else if (!PyCallable_Check(callable)) {
+    else if (!PyCallable_Check(callable))
+    {
         PyErr_SetString(rrdtool_ProgrammingError, "first argument must be callable");
         return NULL;
-    } else {
+    }
+    else
+    {
         _rrdtool_fetch_callable = callable;
         rrd_fetch_cb_register(_rrdtool_fetch_cb_wrapper);
         Py_RETURN_NONE;
@@ -1301,12 +1412,13 @@ _rrdtool_register_fetch_cb(PyObject *Py_UNUSED(self), PyObject *args)
 }
 
 static char _rrdtool_clear_fetch_cb__doc__[] = "Clear callback for "
-    "fetching data";
+                                               "fetching data";
 
 static PyObject *
 _rrdtool_clear_fetch_cb(PyObject *Py_UNUSED(self), PyObject *Py_UNUSED(args))
 {
-    if (_rrdtool_fetch_callable == NULL) {
+    if (_rrdtool_fetch_callable == NULL)
+    {
         PyErr_SetString(rrdtool_ProgrammingError, "no callback has been set previously");
         return NULL;
     }
@@ -1318,8 +1430,8 @@ _rrdtool_clear_fetch_cb(PyObject *Py_UNUSED(self), PyObject *Py_UNUSED(args))
 
 #endif /* WITH_FETCH_CB */
 
-static char _rrdtool_lib_version__doc__[] = "Get the version this binding "\
-  "was compiled against.";
+static char _rrdtool_lib_version__doc__[] = "Get the version this binding "
+                                            "was compiled against.";
 
 /**
  * Returns a str object that contains the librrd version.
@@ -1372,8 +1484,7 @@ static PyMethodDef rrdtool_methods[] = {
 #endif /* WITH_FETCH_CB */
     {"lib_version", (PyCFunction)_rrdtool_lib_version,
      METH_NOARGS, _rrdtool_lib_version__doc__},
-    {NULL, NULL, 0, NULL}
-};
+    {NULL, NULL, 0, NULL}};
 
 /** Library init function. */
 #ifdef HAVE_PY3K
@@ -1382,8 +1493,7 @@ static struct PyModuleDef rrdtoolmodule = {
     .m_name = "rrdtool",
     .m_doc = "Python bindings for rrdtool",
     .m_size = -1,
-    .m_methods = rrdtool_methods
-};
+    .m_methods = rrdtool_methods};
 
 #endif
 
@@ -1391,17 +1501,21 @@ static struct PyModuleDef rrdtoolmodule = {
 PyMODINIT_FUNC
 PyInit_rrdtool(void)
 #else
-void
-initrrdtool(void)
+void initrrdtool(void)
 #endif
 {
     PyObject *m;
 
-    PyDateTime_IMPORT;  /* initialize PyDateTime_ functions */
+    PyDateTime_IMPORT; /* initialize PyDateTime_ functions */
 
-    /* make sure that the GIL has been created as we need to aquire it */
+/* make sure that the GIL has been created as we need to acquire it */
+#if PY_MAJOR_VERSION < 3 || PY_MINOR_VERSION < 7
     if (!PyEval_ThreadsInitialized())
+    {
+        DPRINTF("calling PyEval_InitThreads()\n");
         PyEval_InitThreads();
+    }
+#endif
 
 #ifdef HAVE_PY3K
     m = PyModule_Create(&rrdtoolmodule);
