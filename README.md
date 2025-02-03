@@ -1,5 +1,7 @@
 # python-rrdtool
 
+Updated from [Python RRDTool](https://github.com/commx/python-rrdtool) to support Python 3.11+.
+
 Python bindings for [RRDtool](https://oss.oetiker.ch/rrdtool) for Python 2 and 3.
 
 The bindings are based on the code of the original Python 2 bindings module for rrdtool by Hye-Shik Chang and are now shipped with the RRDtool distribution. This project is maintained separately to provide a more pythonic way to install those bindings via [PyPI](https://pypi.org).
@@ -12,10 +14,10 @@ The bindings are based on the code of the original Python 2 bindings module for 
 
 ## Installation
 
-The most convenient way to install (on POSIX-like systems) is to use pip:
+To use this module, please add the following to your `requirements.txt`:
 
-```shell
-pip install rrdtool
+```text
+rrdtool @git+https://github.com/fredclausen/python-rrdtool.git
 ```
 
 **Note:** Unless binary versions are available for your target system, the command above requires rrdtool development files (headers, libraries, dependencies) to be installed, otherwise building the module will fail.
