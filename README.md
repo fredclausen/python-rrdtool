@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/commx/python-rrdtool.svg?branch=master)](https://travis-ci.org/commx/python-rrdtool)
-
 # python-rrdtool
 
 Python bindings for [RRDtool](https://oss.oetiker.ch/rrdtool) for Python 2 and 3.
@@ -12,12 +10,13 @@ The bindings are based on the code of the original Python 2 bindings module for 
 * Uses library functions as exposed by librrd.
 * Works with Python 2.7, 3.5 and later.
 
-
 ## Installation
 
 The most convenient way to install (on POSIX-like systems) is to use pip:
 
-    pip install rrdtool
+```shell
+pip install rrdtool
+```
 
 **Note:** Unless binary versions are available for your target system, the command above requires rrdtool development files (headers, libraries, dependencies) to be installed, otherwise building the module will fail.
 
@@ -37,7 +36,7 @@ rrdtool.update('test.rrd', 'N:32')
 
 ## Documentation
 
-You can find the latest documentation for this project at https://pythonhosted.org/rrdtool.
+You can find the latest documentation for this project at <https://pythonhosted.org/rrdtool>.
 
 ## License
 
