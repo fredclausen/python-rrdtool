@@ -5,5 +5,3 @@ __pycache__
 docs/_build
 build/
 .vscode/c_cpp_properties.json
-tmp
-rrdtool.egg-info

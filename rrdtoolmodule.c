@@ -293,7 +293,7 @@ _rrdtool_create(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-        status = rrd_create(rrdtool_argc, (const char **)rrdtool_argv);
+        status = rrd_create(rrdtool_argc, rrdtool_argv);
     Py_END_ALLOW_THREADS
 
         if (status == -1)
@@ -335,7 +335,7 @@ _rrdtool_dump(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-        status = rrd_dump(rrdtool_argc, (const char **)rrdtool_argv);
+        status = rrd_dump(rrdtool_argc, rrdtool_argv);
     Py_END_ALLOW_THREADS
 
         if (status != 0)
@@ -377,7 +377,7 @@ _rrdtool_update(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-        status = rrd_update(rrdtool_argc, (const char **)rrdtool_argv);
+        status = rrd_update(rrdtool_argc, rrdtool_argv);
     Py_END_ALLOW_THREADS
 
         if (status == -1)
@@ -413,7 +413,7 @@ _rrdtool_updatev(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-        data = rrd_update_v(rrdtool_argc, (const char **)rrdtool_argv);
+        data = rrd_update_v(rrdtool_argc, rrdtool_argv);
     Py_END_ALLOW_THREADS
 
         if (data == NULL)
@@ -461,7 +461,7 @@ _rrdtool_fetch(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-        status = rrd_fetch(rrdtool_argc, (const char **)rrdtool_argv, &start, &end, &step,
+        status = rrd_fetch(rrdtool_argc, rrdtool_argv, &start, &end, &step,
                            &ds_cnt, &ds_namv, &data);
     Py_END_ALLOW_THREADS
 
@@ -542,7 +542,7 @@ _rrdtool_flushcached(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-        status = rrd_flushcached(rrdtool_argc, (const char **)rrdtool_argv);
+        status = rrd_flushcached(rrdtool_argc, rrdtool_argv);
     Py_END_ALLOW_THREADS
 
         if (status != 0)
@@ -639,7 +639,7 @@ _rrdtool_graph(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-        status = rrd_graph(rrdtool_argc, (const char **)rrdtool_argv, &calcpr, &xsize, &ysize,
+        status = rrd_graph(rrdtool_argc, rrdtool_argv, &calcpr, &xsize, &ysize,
                            NULL, &ymin, &ymax);
     Py_END_ALLOW_THREADS
 
@@ -701,7 +701,7 @@ _rrdtool_graphv(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-        data = rrd_graph_v(rrdtool_argc, (const char **)rrdtool_argv);
+        data = rrd_graph_v(rrdtool_argc, rrdtool_argv);
     Py_END_ALLOW_THREADS
 
         if (data == NULL)
@@ -753,7 +753,7 @@ _rrdtool_xport(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-        status = rrd_xport(rrdtool_argc, (const char **)rrdtool_argv, &xsize, &start, &end, &step,
+        status = rrd_xport(rrdtool_argc, rrdtool_argv, &xsize, &start, &end, &step,
                            &col_cnt, &legend_v, &data);
     Py_END_ALLOW_THREADS
 
@@ -859,7 +859,7 @@ _rrdtool_tune(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-        status = rrd_tune(rrdtool_argc, (const char **)rrdtool_argv);
+        status = rrd_tune(rrdtool_argc, rrdtool_argv);
     Py_END_ALLOW_THREADS
 
         if (status == -1)
@@ -900,7 +900,7 @@ _rrdtool_first(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-        ts = rrd_first(rrdtool_argc, (const char **)rrdtool_argv);
+        ts = rrd_first(rrdtool_argc, rrdtool_argv);
     Py_END_ALLOW_THREADS
 
         if (ts == -1)
@@ -936,7 +936,7 @@ _rrdtool_last(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-        ts = rrd_last(rrdtool_argc, (const char **)rrdtool_argv);
+        ts = rrd_last(rrdtool_argc, rrdtool_argv);
     Py_END_ALLOW_THREADS
 
         if (ts == -1)
@@ -974,7 +974,7 @@ _rrdtool_resize(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-        status = rrd_resize(rrdtool_argc, (const char **)rrdtool_argv);
+        status = rrd_resize(rrdtool_argc, rrdtool_argv);
     Py_END_ALLOW_THREADS
 
         if (status == -1)
@@ -1015,7 +1015,7 @@ _rrdtool_info(PyObject *Py_UNUSED(self), PyObject *args)
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS
-        data = rrd_info(rrdtool_argc, (const char **)rrdtool_argv);
+        data = rrd_info(rrdtool_argc, rrdtool_argv);
     Py_END_ALLOW_THREADS
 
         if (data == NULL)
